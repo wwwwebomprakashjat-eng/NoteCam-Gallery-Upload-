@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NoteCam GALLERY UPLOAD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.75rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* File Input */
+        .file-input {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .file-input:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+
+        /* Image Wrapper */
+        .image-wrapper {
+            margin: 20px 0;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        #previewImage {
+            width: 100%;
+            display: block;
+        }
+
+        /* Info Box - Mobile First Approach */
+        .info-box {
+            position: absolute;
+            bottom: 0.125rem;
+            left: 0.125rem;
+            background: rgba(255, 255, 255, 0.55);
+            padding: 0.125rem 0.125rem;
+            border-radius: 0;
+            font-size: 0.5625rem;
+            line-height: 1.15;
+            color: #000;
+            width: 8.75rem;
+            z-index: 10;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        .info-box div {
+            margin: 0.0625rem 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .info-box div:first-child {
+            margin-top: 0.125rem;
+        }
+
+        .info-box div:last-child {
+            margin-bottom: 0.125rem;
+        }
+
+        .info-box b {
+            font-weight: 400;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            bottom: 0.25rem;
+            right: 0.625rem;
+            color: #FF4A1C;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            font-style: italic;
+            text-shadow: 
+                0 0 2px #2C2392,
+                0 0 3.5px #2C2392;
+            z-index: 5;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        /* Edit Section */
+        .edit-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .edit-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.875rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-family: Arial, Helvetica, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .input-field[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .textarea-field {
+            resize: vertical;
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 50px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-location {
+            background: #f59e0b;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .btn-location:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-location:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .location-status {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #059669;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .location-status.error {
+            color: #dc2626;
+        }
+
+        .btn-update {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-update:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-download {
+            background: #667eea;
+            color: white;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .btn-download:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tablet & Desktop */
+        @media (min-width: 600px) {
+            .info-box {
+                font-size: 0.75rem;
+                width: 10rem;
+                padding: 0.125rem 0.125rem;
+            }
+            
+            .watermark {
+                font-size: 0.875rem;
+                bottom: 0.21875rem;
+                right: 1rem;
+            }
+        }
+
+        /* Small Mobile Fine-tuning */
+        @media (max-width: 380px) {
+            .info-box {
+                font-size: 0.5rem !important;
+                width: 7.5rem !important;
+            }
+            
+            .watermark {
+                font-size: 0.625rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NoteCam GALLERY UPLOAD</h1>
+        
+        <button id="getLocationBtn" class="btn btn-location" onclick="getCurrentLocation()">
+            📍 Get Current Location
+        </button>
+        
+        <div id="locationStatus" class="location-status" style="display: none;"></div>
+        
+        <input type="file" id="fileInput" accept="image/*" class="file-input">
+        
+        <div id="imageWrapper" class="image-wrapper" style="display: none;">
+            <div class="image-container">
+                <img id="previewImage" alt="Preview">
+                <div id="infoBox" class="info-box"></div>
+                <div class="watermark">Powered by NoteCam</div>
+            </div>
+        </div>
+        
+        <div id="editSection" class="edit-section" style="display: none;">
+            <h3>📝 Edit Details</h3>
+            
+            <div class="form-group">
+                <label>Language / भाषा:</label>
+                <select id="language" class="input-field" onchange="updateInfo()">
+                    <option value="hi">Hindi (हिंदी)</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Font Style / फ़ॉन्ट:</label>
+                <select id="fontFamily" class="input-field" onchange="updateInfo()">
+                    <option value="Arial, Helvetica, sans-serif">Arial</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="Verdana, sans-serif">Verdana</option>
+                    <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                    <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                    <option value="Impact, fantasy">Impact</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label id="labelLatitude">अक्षांश (Latitude):</label>
+                <input type="text" id="latitude" value="Loading..." class="input-field" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label id="labelLongitude">देशान्तर (Longitude):</label>
+                <input type="text" id="longitude" value="Loading..." class="input-field" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label id="labelAltitude">ऊंचाई (Altitude):</label>
+                <input type="text" id="altitude" value="Loading..." class="input-field" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label id="labelAccuracy">सटीकता (Accuracy):</label>
+                <input type="text" id="accuracy" value="Loading..." class="input-field" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label id="labelNote">नोट (Note):</label>
+                <textarea id="noteInput" placeholder="Enter your note..." class="input-field textarea-field" rows="2"></textarea>
+            </div>
+            
+            <button onclick="updateInfo()" class="btn btn-update">Update Preview</button>
+        </div>
+        
+        <button id="downloadBtn" onclick="downloadImage()" class="btn btn-download" style="display: none;">
+            💾 Download Photo
+        </button>
+        
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+
+    <script>
+        // Global Variables
+        let selectedImage = null;
+        let currentLanguage = 'hi';
+        let selectedFont = 'Arial, Helvetica, sans-serif';
+        let locationData = {
+            latitude: null,
+            longitude: null,
+            altitude: null,
+            accuracy: null
+        };
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const imageWrapper = document.getElementById('imageWrapper');
+        const previewImage = document.getElementById('previewImage');
+        const infoBox = document.getElementById('infoBox');
+        const editSection = document.getElementById('editSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvas = document.getElementById('canvas');
+        const locationBtn = document.getElementById('getLocationBtn');
+        const locationStatus = document.getElementById('locationStatus');
+
+        // Input Fields
+        const languageSelect = document.getElementById('language');
+        const fontSelect = document.getElementById('fontFamily');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const altitudeInput = document.getElementById('altitude');
+        const accuracyInput = document.getElementById('accuracy');
+        const noteInput = document.getElementById('noteInput');
+
+        // Labels
+        const labels = {
+            hi: {
+                latitude: 'अक्षांश',
+                longitude: 'देशान्तर',
+                altitude: 'ऊंचाई',
+                accuracy: 'सटीकता',
+                time: 'समय',
+                note: 'नोट'
+            },
+            en: {
+                latitude: 'Latitude',
+                longitude: 'Longitude',
+                altitude: 'Elevation',
+                accuracy: 'Accuracy',
+                time: 'Time',
+                note: 'Note'
+            }
+        };
+
+        // Get Current Location
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                showLocationStatus('Geolocation is not supported by your browser', true);
+                return;
+            }
+
+            locationBtn.disabled = true;
+            locationBtn.textContent = '⏳ Getting Location...';
+            showLocationStatus('Fetching your location...', false);
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lng = position.coords.longitude.toFixed(6);
+                    const alt = position.coords.altitude;
+                    const acc = position.coords.accuracy;
+
+                    locationData.latitude = lat;
+                    locationData.longitude = lng;
+                    locationData.altitude = alt;
+                    locationData.accuracy = acc;
+
+                    let altitudeText = 'N/A';
+                    if (alt !== null) {
+                        const altRounded = alt.toFixed(2);
+                        const altAccuracy = (acc / 2).toFixed(0);
+                        altitudeText = `${altRounded}±${altAccuracy} m`;
+                    } else {
+                        altitudeText = 'Not available';
+                    }
+
+                    const accuracyText = acc ? `${acc.toFixed(1)} m` : 'N/A';
+
+                    latitudeInput.value = lat;
+                    longitudeInput.value = lng;
+                    altitudeInput.value = altitudeText;
+                    accuracyInput.value = accuracyText;
+
+                    if (selectedImage) {
+                        updateInfo();
+                    }
+
+                    showLocationStatus(`✅ Location fetched successfully!`, false);
+                    locationBtn.disabled = false;
+                    locationBtn.textContent = '📍 Get Current Location';
+
+                    setTimeout(() => {
+                        locationStatus.style.display = 'none';
+                    }, 3000);
+                },
+                (error) => {
+                    let errorMessage = 'Unable to get location';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = '❌ Location permission denied.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = '❌ Location unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = '❌ Request timed out.';
+                            break;
+                    }
+
+                    showLocationStatus(errorMessage, true);
+                    locationBtn.disabled = false;
+                    locationBtn.textContent = '📍 Get Current Location';
+
+                    latitudeInput.value = 'Click "Get Location"';
+                    longitudeInput.value = 'Click "Get Location"';
+                    altitudeInput.value = 'Click "Get Location"';
+                    accuracyInput.value = 'Click "Get Location"';
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        function showLocationStatus(message, isError) {
+            locationStatus.textContent = message;
+            locationStatus.className = isError ? 'location-status error' : 'location-status';
+            locationStatus.style.display = 'block';
+        }
+
+        window.addEventListener('load', () => {
+            getCurrentLocation();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    selectedImage = event.target.result;
+                    previewImage.src = selectedImage;
+                    imageWrapper.style.display = 'block';
+                    editSection.style.display = 'block';
+                    downloadBtn.style.display = 'block';
+                    updateInfo();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function getCurrentDateTime() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${day}-${month}-${year} ${hours}:${minutes}`;
+        }
+
+        function updateInfo() {
+            currentLanguage = languageSelect.value;
+            selectedFont = fontSelect.value;
+            const currentTime = getCurrentDateTime();
+            const noteText = noteInput.value || 'testing Note';
+            const lang = labels[currentLanguage];
+            
+            infoBox.style.fontFamily = selectedFont;
+            
+            const truncate = (text, max = 12) => {
+                return text.length > max ? text.substring(0, max) + '...' : text;
+            };
+            
+            infoBox.innerHTML = `
+                <div>${lang.latitude}: <b>${latitudeInput.value}</b></div>
+                <div>${lang.longitude}: <b>${longitudeInput.value}</b></div>
+                <div>${lang.altitude}: <b>${truncate(altitudeInput.value, 15)}</b></div>
+                <div>${lang.accuracy}: <b>${accuracyInput.value}</b></div>
+                <div>${lang.time}: <b>${currentTime}</b></div>
+                <div>${lang.note}: <b>${truncate(noteText, 12)}</b></div>
+            `;
+            
+            document.querySelector('.watermark').style.fontFamily = selectedFont;
+            
+            document.getElementById('labelLatitude').textContent = currentLanguage === 'hi' ? 'अक्षांश (Latitude):' : 'Latitude:';
+            document.getElementById('labelLongitude').textContent = currentLanguage === 'hi' ? 'देशान्तर (Longitude):' : 'Longitude:';
+            document.getElementById('labelAltitude').textContent = currentLanguage === 'hi' ? 'ऊंचाई (Altitude):' : 'Elevation:';
+            document.getElementById('labelAccuracy').textContent = currentLanguage === 'hi' ? 'सटीकता (Accuracy):' : 'Accuracy:';
+            document.getElementById('labelNote').textContent = currentLanguage === 'hi' ? 'नोट (Note):' : 'Note:';
+        }
+
+        function downloadImage() {
+            if (!selectedImage) return;
+            
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                // Use a fixed scale ratio based on standard image width
+                const baseWidth = 1080; // Standard mobile camera width
+                const scale = img.width / baseWidth;
+                
+                const BASE_TEXT = 12;
+                const BASE_WM = 14;
+                
+                const textSize = BASE_TEXT * scale;
+                const wmSize = BASE_WM * scale;
+                
+                const lineHeight = textSize * 1.15;
+                const padding = textSize * 0.15;
+                
+                const currentTime = getCurrentDateTime();
+                const noteText = noteInput.value || 'testing Note';
+                const lang = labels[currentLanguage];
+                
+                const lines = [
+                    `${lang.latitude}: ${latitudeInput.value}`,
+                    `${lang.longitude}: ${longitudeInput.value}`,
+                    `${lang.altitude}: ${altitudeInput.value}`,
+                    `${lang.accuracy}: ${accuracyInput.value}`,
+                    `${lang.time}: ${currentTime}`,
+                    `${lang.note}: ${noteText}`
+                ];
+                
+                ctx.font = `${textSize}px ${selectedFont}`;
+                
+                const boxWidth = 160 * scale;
+                const boxHeight = (lines.length * lineHeight) + (padding * 2.5);
+                
+                const boxX = 2 * scale;
+                const boxY = img.height - boxHeight - (2 * scale);
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.06)';
+                ctx.shadowBlur = 2;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 1;
+                
+                ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+                
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                
+                ctx.fillStyle = '#000000';
+                ctx.font = `${textSize}px ${selectedFont}`;
+                ctx.textBaseline = 'top';
+                
+                lines.forEach((line, index) => {
+                    const textX = boxX + (padding * 2);
+                    const extraMargin = (index === 0) ? (2 * scale) : 0;
+                    const textY = boxY + (padding * 2) + (index * lineHeight) + extraMargin;
+                    
+                    const parts = line.split(': ');
+                    if (parts.length === 2) {
+                        ctx.font = `${textSize}px ${selectedFont}`;
+                        ctx.fillText(parts[0] + ': ', textX, textY);
+                        
+                        const labelWidth = ctx.measureText(parts[0] + ': ').width;
+                        ctx.font = `${textSize}px ${selectedFont}`;
+                        ctx.fillText(parts[1], textX + labelWidth, textY);
+                    } else {
+                        ctx.fillText(line, textX, textY);
+                    }
+                });
+                
+                ctx.font = `bold italic ${wmSize}px ${selectedFont}`;
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+                
+                const wmX = img.width - (16 * scale);
+                const wmY = img.height - (3.5 * scale);
+                const wmText = 'Powered by NoteCam';
+                
+                ctx.shadowColor = '#2C2392';
+                ctx.shadowBlur = 2 * scale;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                
+                ctx.fillStyle = '#FF4A1C';
+                ctx.fillText(wmText, wmX, wmY);
+                ctx.shadowBlur = 2 * scale;
+                ctx.fillText(wmText, wmX, wmY);
+                ctx.shadowBlur = 0 * scale;
+                ctx.fillText(wmText, wmX, wmY);
+                
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `notecam_${Date.now()}.jpg`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert('✅ Photo successfully downloaded!');
+                }, 'image/jpeg', 0.95);
+            };
+            
+            img.src = selectedImage;
+        }
+
+        noteInput.addEventListener('input', updateInfo);
+    </script>
+</body>
+</html>
